@@ -14,6 +14,7 @@ Projekt je rozdělen do více částí:
 | `Taskami.Client` | Automaticky generovaný C# klient pro přístup k API (SDK) |
 | `Taskami.WebUI` | Webová aplikace (např. Razor Pages / Blazor / jiné) pro práci s API |
 | `Taskami.WPFUI` | Desktopová aplikace ve WPF jako alternativní frontend |
+
 Mobilní verze (Flutter/Kotlin) je možnou budoucí rozšířenou alternativou, ale prozatím není v plánu.
 Též zvažuji přepsat [Todoist Widget](https://github.com/danixek/todoist-widget) z Pythonu do C# nejen pro jednotnost jazyka, ale také pro rozšíření kompatibility s Taskami.
 
