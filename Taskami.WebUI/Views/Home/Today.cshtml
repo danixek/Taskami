@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Today";
+}
+
+<div class="text-center my-5">
+    <h1 class="display-4">Taskami</h1>
+    <p>The To-Do list clone of Todoist.</p>
+</div>
+
+<div class="text-left my-5">
+    <h2>Dnes</h2>
+    <p>n úkolů | 15m</p>
+
+    Nesplněné
+    <form asp-controller="Home" asp-action="Reschedule" method="post" class="d-inline ms-auto">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-link p-0 m-0 align-baseline">Přeplánovat</button>
+    </form>
+
+</div>
+
