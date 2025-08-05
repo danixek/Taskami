@@ -1,11 +1,18 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Text.Json;
 using Taskami.WebUI.Models;
 
 namespace TaskamiUI.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly TodoistFetcher _fetcher;
+
+        public HomeController(TodoistFetcher fetcher)
+        {
+            _fetcher = fetcher;
+        }
 
         // The main landing page of the application
         public IActionResult Index()
@@ -13,8 +20,15 @@ namespace TaskamiUI.Controllers
             return View();
         }
         // The main dashboard where users can see their tasks and activities
-        public IActionResult Today()
+        public async Task<IActionResult> Today()
         {
+            var rawJson = await _fetcher.FetchTodaysTasksAsync();
+            var resultsElement = JsonDocument.Parse(rawJson).RootElement.GetProperty("results");
+
+            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.GetRawText());
+
+            ViewBag.Tasks = tasks ?? new List<TodoistTask>();
+
             return View();
         }
         // The page where users can view and manage their tasks - calendar mode
@@ -39,9 +53,14 @@ namespace TaskamiUI.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Reschedule()
+        public void Reschedule(string? TaskId)
         {
-            return RedirectToAction("Index");
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task Complete(string TaskId)
+        {
+            await _fetcher.CompleteTaskAsync(TaskId);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -49,5 +68,6 @@ namespace TaskamiUI.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
     }
 }

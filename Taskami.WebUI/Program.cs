@@ -1,7 +1,15 @@
+using System.Net.Http.Headers;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient<TodoistFetcher>(client =>
+{
+    var apiKey = builder.Configuration["TodoistApiKey"]; // apiKey z appsettings.json
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+});
+
 
 var app = builder.Build();
 
