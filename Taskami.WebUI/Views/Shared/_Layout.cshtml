@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+    string primaryBackgroundColor = ViewData["PrimaryBackgroundColor"] as string ?? "#222";
+    string secondaryBackgroundColor = ViewData["SecondaryBackgroundColor"] as string ?? primaryBackgroundColor;
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -9,9 +13,10 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark box-shadow mb-3 px-2">
-            <div class="container-fluid px-0">
+            <div class="container-fluid px-3">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Taskami</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -27,7 +32,7 @@
             </div>
         </nav>
 
-        <nav class="sidebar">
+        <nav class="sidebar" style="background-color: @secondaryBackgroundColor">
             <a title="Inbox" asp-controller="Home" asp-action="Index"><i class="bi bi-house-door-fill"></i></a>
             <a title="Today" asp-controller="Home" asp-action="Today"><i class="bi bi-calendar-day"></i></a>
             <a title="Upcoming" asp-controller="Home" asp-action="Calendar"><i class="bi bi-calendar3"></i></a>

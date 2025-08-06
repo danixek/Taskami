@@ -1,5 +1,11 @@
 ﻿@{
-    ViewData["Title"] = "Today";
+    ViewData["Title"] = "Dnes";
+    var tasks = ViewBag.Tasks as List<Taskami.WebUI.Models.TodoistTask>;
+    var todaysTasks = tasks?.Where(t => t.Due != null && DateOnly.FromDateTime(t.Due.Date) == DateOnly.FromDateTime(DateTime.Today)).ToList() ?? new List<Taskami.WebUI.Models.TodoistTask>();
+    var otherTasks = tasks?.Except(todaysTasks).ToList();
+
+    string primaryBackgroundColor = ViewData["PrimaryBackgroundColor"] as string ?? "#222";
+    string secondaryBackgroundColor = ViewData["SecondaryBackgroundColor"] as string ?? primaryBackgroundColor;
 }
 
 <div class="text-center my-5">
@@ -9,96 +15,28 @@
 
 <div class="text-left my-5">
     <h2>Dnes</h2>
-    <p>n úkolů | 15m</p>
+    <p>Celkem @(tasks?.Count ?? 0) úkolů</p>
+    @if (todaysTasks.Any())
+    {
+        @await Html.PartialAsync("_LoadingTasks", todaysTasks)
+    }
 
-    <div class="d-flex">
+    <div class="d-flex mt-4">
         Zpožděné
         <form asp-controller="Home" asp-action="Reschedule" method="post" class="d-inline ms-auto">
             @Html.AntiForgeryToken()
             <button type="submit" class="btn btn-link text-white p-0 m-0 align-baseline">Přeplánovat</button>
         </form>
     </div><br />
-    @foreach (var task in (List<Taskami.WebUI.Models.TodoistTask>)ViewBag.Tasks)
+
+    @if (otherTasks!.Any())
     {
-        string priorityColor = "200,200,200"; // nebo nějaká výchozí barva
-        if (task.Priority == 1)
-        {
-            priorityColor = "100, 100, 100"; // šedá
-        }
-        else if (task.Priority == 2)
-        {
-            priorityColor = "0, 0, 255"; // modrá
-        }
-        else if (task.Priority == 3)
-        {
-            priorityColor = "255, 165, 0"; // oranžová
-        }
-        else
-        {
-            priorityColor = "255, 0, 0"; // např. červená
-        }
-        string datetimeColor = "100,100,100"; // nebo nějaká výchozí barva
-        if (task.Due != null)
-        {
-            if (task.Due.Date > DateTime.Now)
-            {
-                datetimeColor = "0, 200, 0"; // zelená
-            }
-            else if (task.Due.Date >= DateTime.Now.AddMinutes(-10) && task.Due.Date <= DateTime.Now.AddMinutes(10))
-            {
-                datetimeColor = "255, 165, 0"; // oranžová
-            }
-            else
-            {
-                datetimeColor = "255, 0, 0"; // červená
-            }
-        }
-
-        var parentPadding = task.ParentId != null ? "padding-left: 40px;" : "padding-left: 0px;";
-
-        <div style="@parentPadding">
-            <div class="d-inline-flex flex-nowrap align-items-center ms-5">
-                <form asp-controller="Home" asp-action="Complete" method="post" class="d-inline ms-auto">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="TaskId" value="@task.TaskId" />
-                    <button type="submit"
-                            style="padding: 10px; background-color: rgba(@priorityColor,0.4);
-                                border: 2px solid rgb(@priorityColor); border-radius: 100px">
-                    </button>
-                </form>
-                <p style="padding: 13px 15px 5px 15px; margin: 0px">@task.Content</p>
-            </div>
-            @if (task.Description != null)
-            {
-                <p class="text-muted ms-5 ps-5 mb-0" style="font-size: 80%; padding-bottom: 5px">
-                    @if (@task.Description != null && task.Description.StartsWith("**Current streak:**")) {
-                        <b style="@parentPadding">Streak: @task.Description.Substring(19, task.Description.Length - 5 - 19) dní</b>
-                    }
-                    else {
-                        @task.Description
-                    }
-
-                </p>
-            }
-            @if (task.Due != null)
-            {
-                <p class="ms-5 mb-0" style="font-size: 80%; color: rgb(@datetimeColor)">
-                    <i class="bi bi-calendar" style="margin-left: 50px; margin-right: 10px"></i>
-                    @task.Due.Date.ToString("dd.MM.yyyy")
-                    @if (task.Due.DueString != null)
-                    {
-                        @task.Due.DueString
-                    }
-                </p>
-            }
-
-        </div>
+        @await Html.PartialAsync("_LoadingTasks", otherTasks)
     }
+
+    </div>
 
     @foreach (var task in (List<Taskami.WebUI.Models.TodoistTask>)ViewBag.Tasks)
     {
         <pre>@task</pre>
     }
-
-</div>
-

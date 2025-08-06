@@ -1,5 +1,10 @@
 ﻿@{
-    ViewData["Title"] = "Inbox";
+    ViewData["Title"] = "Kalendář";
+    var tasks = ViewBag.Tasks as List<Taskami.WebUI.Models.TodoistTask> ?? new();
+    var todaysTasks = tasks.Where(t => t.Due != null && DateOnly.FromDateTime(t.Due.Date) == DateOnly.FromDateTime(DateTime.Today)).ToList() ?? new List<Taskami.WebUI.Models.TodoistTask>();
+    var tomorrowTasks = tasks
+        .Where(t => t.Due != null && DateOnly.FromDateTime(t.Due.Date) == DateOnly.FromDateTime(DateTime.Today.AddDays(1)))
+        .ToList();
 }
 
 <div class="text-center my-5">
@@ -8,5 +13,30 @@
 </div>
 
 <div class="text-left my-5">
-    <h2>Upcoming</h2>
+    <h2>Nadcházející</h2>
+    <h3 class="mt-4 text-center fs-4">Dnes</h3>
+    @if (todaysTasks.Any())
+    {
+        @await Html.PartialAsync("_LoadingTasks", todaysTasks)
+    }
+    <h3 class="mt-4 text-center fs-4">Zítra</h3>
+    @if (tomorrowTasks!.Any())
+    {
+        @await Html.PartialAsync("_LoadingTasks", tomorrowTasks)
+    }
+    @for (int i = 1; i <= 30; i++)
+    {
+        var targetDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1 + i));
+        var dayTasks = tasks
+        .Where(t => t.Due != null && DateOnly.FromDateTime(t.Due.Date) == targetDate)
+        .ToList();
+
+        if (dayTasks.Any())
+        {
+            <h3 class="mt-4 text-center fs-4">@targetDate.ToString("dddd, dd. MM. yyyy")</h3>
+            @await Html.PartialAsync("_LoadingTasks", dayTasks)
+        }
+    }
+
+
 </div>

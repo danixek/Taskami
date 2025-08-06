@@ -1,0 +1,141 @@
+﻿@model List<Taskami.WebUI.Models.TodoistTask>
+@{
+    var tasks = Model;
+    string primaryBackgroundColor = ViewData["PrimaryBackgroundColor"] as string ?? "#222";
+    string secondaryBackgroundColor = ViewData["SecondaryBackgroundColor"] as string ?? primaryBackgroundColor;
+}
+
+<style>
+    .parent {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        padding: 20px;
+    }
+
+        .parent.nochild {
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .parent:not(.nochild) {
+            padding-bottom: 10px;
+        }
+
+    .child {
+        padding: 0px 0px 0px 70px;
+    }
+
+        .child.last-child {
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            padding-bottom: 20px;
+        }
+
+</style>
+
+@for (int i = 0; i < tasks!.Count; i++)
+{
+    var task = tasks[i]!;
+
+    string priorityColor = "200,200,200"; // nebo nějaká výchozí barva
+    if (task.Priority == 1)
+    {
+        priorityColor = "100, 100, 100"; // šedá
+    }
+    else if (task.Priority == 2)
+    {
+        priorityColor = "0, 0, 255"; // modrá
+    }
+    else if (task.Priority == 3)
+    {
+        priorityColor = "255, 165, 0"; // oranžová
+    }
+    else
+    {
+        priorityColor = "255, 0, 0"; // např. červená
+    }
+    string datetimeColor = "100,100,100"; // nebo nějaká výchozí barva
+    if (task.Due != null)
+    {
+        if (task.Due.Date > DateTime.Now)
+        {
+            datetimeColor = "0, 200, 0"; // zelená
+        }
+        else if (task.Due.Date >= DateTime.Now.AddMinutes(-10) && task.Due.Date <= DateTime.Now.AddMinutes(10))
+        {
+            datetimeColor = "255, 165, 0"; // oranžová
+        }
+        else
+        {
+            datetimeColor = "255, 0, 0"; // červená
+        }
+    }
+
+    string cssClass = "";
+
+    if (task.ParentId != null)
+    {
+        bool isLastChild = i == tasks.Count - 1 || tasks[i + 1].ParentId == null || tasks[i + 1].ParentId != task.ParentId;
+        cssClass = "child" + (isLastChild ? " last-child" : "");
+    }
+    else
+    {
+        // Je to parent
+        bool hasChild = i < tasks.Count - 1 && tasks[i + 1].ParentId == task.TaskId;
+        cssClass = "parent" + (!hasChild ? " nochild my-2" : "");
+    }
+    <div style="background-color: @secondaryBackgroundColor" class="ms-5 me-5 @cssClass">
+
+        <div class="d-flex align-items-center w-100">
+
+            <!-- tlačítko -->
+            <form asp-controller="Home" asp-action="Complete" method="post" class="me-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="TaskId" value="@task.TaskId" />
+                <button type="submit"
+                        style="padding: 10px; background-color: rgba(@priorityColor,0.4);
+                                    border: 2px solid rgb(@priorityColor); border-radius: 100px">
+                </button>
+            </form>
+
+            <!-- obsah (roste do šířky) -->
+            <div class="flex-grow-1">
+                <div>@task.Content</div>
+            </div>
+
+            <!-- datum -->
+            @if (task.Due != null)
+            {
+                <div style="font-size: 80%; color: rgb(@datetimeColor)" title="@task.Due.Date.ToString("dd.MM.yyyy") @if (task.Due.DueString != null) {
+                @task.Due.DueString
+            }
+    ">
+                <i class="bi bi-calendar" style="margin-right: 5px"></i>
+                @task.Due.Date.ToString("dd.MM.yyyy")@if (task.Due.DueString != null && task.Due.DueString.Contains(":"))
+                {
+                    @(", " + task.Due.DueString.Substring(task.Due.DueString.Length - 5))
+                }
+            </div>
+        }
+
+    </div>
+    @if (task.Description != null)
+    {
+        <p class="text-muted mb-0" style="font-size: 80%; padding-left: 40px; padding-bottom: 5px">
+            @if (@task.Description != null && task.Description.StartsWith("**Current streak:**"))
+            {
+                <b>
+                    Streak:
+                    @task.Description.Substring(19, task.Description.Length - 5 - 19) dní
+                </b>
+            }
+            else
+            {
+                @task.Description
+            }
+
+        </p>
+    }
+</div>
+
+     }

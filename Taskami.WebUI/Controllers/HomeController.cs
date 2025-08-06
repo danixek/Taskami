@@ -32,8 +32,14 @@ namespace TaskamiUI.Controllers
             return View();
         }
         // The page where users can view and manage their tasks - calendar mode
-        public IActionResult Calendar()
+        public async Task<IActionResult> Calendar()
         {
+            var rawJson = await _fetcher.FetchTodaysTasksAsync();
+            var resultsElement = JsonDocument.Parse(rawJson).RootElement.GetProperty("results");
+
+            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.GetRawText());
+
+            ViewBag.Tasks = tasks ?? new List<TodoistTask>();
             return View();
         }
         // Filters and labels are used to categorize tasks
@@ -58,9 +64,11 @@ namespace TaskamiUI.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task Complete(string TaskId)
+        public async Task<IActionResult> Complete(string TaskId)
         {
             await _fetcher.CompleteTaskAsync(TaskId);
+
+            return Redirect(Request.Headers["Referer"].ToString());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
