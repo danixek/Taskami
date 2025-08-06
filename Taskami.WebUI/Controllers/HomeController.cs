@@ -15,8 +15,15 @@ namespace TaskamiUI.Controllers
         }
 
         // The main landing page of the application
-        public IActionResult Index()
+        public async Task<IActionResult> Inbox()
         {
+            var rawJson = await _fetcher.FetchTodaysTasksAsync();
+            var resultsElement = JsonDocument.Parse(rawJson).RootElement.GetProperty("results");
+
+            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.GetRawText());
+
+            ViewBag.Tasks = tasks ?? new List<TodoistTask>();
+
             return View();
         }
         // The main dashboard where users can see their tasks and activities

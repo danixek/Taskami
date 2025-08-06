@@ -1,7 +1,39 @@
 ﻿@{
     ViewData["Title"] = "Dnes";
-    var tasks = ViewBag.Tasks as List<Taskami.WebUI.Models.TodoistTask>;
-    var todaysTasks = tasks?.Where(t => t.Due != null && DateOnly.FromDateTime(t.Due.Date) == DateOnly.FromDateTime(DateTime.Today)).ToList() ?? new List<Taskami.WebUI.Models.TodoistTask>();
+    var rawTasks = ViewBag.Tasks as List<Taskami.WebUI.Models.TodoistTask> ?? new();
+    var orderedParents = rawTasks
+    .Where(t => t.ParentId == null)
+    .OrderBy(t =>
+        t.Description != null && t.Description.StartsWith("**Current streak:**") ? 0 :
+        (t.Due != null && t.Due.Date.TimeOfDay > TimeSpan.Zero ? 1 : 2))
+    .ThenBy(t => t.Due?.Date)
+    .ToList();
+    var resultTasks = new List<Taskami.WebUI.Models.TodoistTask>();
+
+    foreach (var parent in orderedParents)
+    {
+        resultTasks.Add(parent);
+
+        var children = rawTasks
+            .Where(t => t.ParentId == parent.TaskId)
+            .OrderBy(t => t.Due?.Date) // nebo jak chceš řadit děti
+            .ToList();
+
+        resultTasks.AddRange(children);
+    }
+    var tasks = resultTasks;
+
+
+    var todaysParentIds = tasks
+    .Where(t => t.Due != null && DateOnly.FromDateTime(t.Due.Date) == DateOnly.FromDateTime(DateTime.Today))
+    .Select(t => t.ParentId ?? t.TaskId)
+    .Distinct()
+    .ToList();
+
+    var todaysTasks = tasks
+        .Where(t => (t.ParentId == null && todaysParentIds.Contains(t.TaskId))
+                 || (t.ParentId != null && todaysParentIds.Contains(t.ParentId)))
+        .ToList();
     var otherTasks = tasks?.Except(todaysTasks).ToList();
 
     string primaryBackgroundColor = ViewData["PrimaryBackgroundColor"] as string ?? "#222";
@@ -33,10 +65,4 @@
     {
         @await Html.PartialAsync("_LoadingTasks", otherTasks)
     }
-
     </div>
-
-    @foreach (var task in (List<Taskami.WebUI.Models.TodoistTask>)ViewBag.Tasks)
-    {
-        <pre>@task</pre>
-    }

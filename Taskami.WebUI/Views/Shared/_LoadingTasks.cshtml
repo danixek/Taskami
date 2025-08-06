@@ -12,24 +12,24 @@
         padding: 20px;
     }
 
-        .parent.nochild {
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-        }
+    .parent.nochild {
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
 
-        .parent:not(.nochild) {
-            padding-bottom: 10px;
-        }
+    .parent:not(.nochild) {
+        padding-bottom: 10px;
+    }
 
     .child {
         padding: 0px 0px 0px 70px;
     }
 
-        .child.last-child {
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-            padding-bottom: 20px;
-        }
+    .child.last-child {
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        padding-bottom: 20px;
+    }
 
 </style>
 
@@ -76,7 +76,7 @@
     if (task.ParentId != null)
     {
         bool isLastChild = i == tasks.Count - 1 || tasks[i + 1].ParentId == null || tasks[i + 1].ParentId != task.ParentId;
-        cssClass = "child" + (isLastChild ? " last-child" : "");
+        cssClass = "child" + (isLastChild ? " last-child mb-2" : "");
     }
     else
     {
@@ -98,8 +98,8 @@
                 </button>
             </form>
 
-            <!-- obsah (roste do šířky) -->
-            <div class="flex-grow-1">
+            <!-- Titulek - název úkolu -->
+            <div class="flex-grow-1 mt-1">
                 <div>@task.Content</div>
             </div>
 
