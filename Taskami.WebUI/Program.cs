@@ -1,15 +1,20 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
+using Taskami.WebUI.Models;
+using Taskami.WebUI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
-builder.Services.AddHttpClient<TodoistFetcher>(client =>
-{
-    var apiKey = builder.Configuration["TodoistApiKey"]; // apiKey z appsettings.json
-    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-});
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient<TodoistFetcher>()
+    .AddHttpMessageHandler<ApiKeyHandler>();
+
+builder.Services.AddTransient<ApiKeyHandler>();
 
 var app = builder.Build();
 

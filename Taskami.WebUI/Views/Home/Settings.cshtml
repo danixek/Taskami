@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Settings";
+    ViewData["Title"] = "Nastavení";
 }
 
 <div class="text-center my-5">
@@ -7,6 +7,15 @@
     <p>The To-Do list clone of Todoist.</p>
 </div>
 
-<div class="text-left my-5">
-    <h2>Settings</h2>
+<div class="text-left m-5">
+    <h2>Nastavení</h2>
+    <h3 class="my-3 text-center fs-4">Barvy</h3>
+    <h3 class="my-3 text-center fs-4">Todoist API klíč</h3>
+    <form asp-action="SetAPIKey" asp-controller="Home" method="post">
+        @Html.AntiForgeryToken()
+        <label for="apiKey">API klíč:</label>
+        <input type="text" id="apiKey" name="apiKey" value="@Model" />
+        <button type="submit">Uložit</button>
+    </form>
+
 </div>
