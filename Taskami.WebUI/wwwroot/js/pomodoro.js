@@ -2,8 +2,12 @@
     let timer;
     isWorkSession = true;
     let isRunning = false;
-    let timeLeft = 25; // 25 minutes in seconds
     let completedWorkSessions = 0;
+
+    const work = getMinutes('work');
+    const shortBreak = getMinutes('shortBreak');
+    const longBreak = getMinutes('longBreak');
+    let timeLeft = work; // 25 minutes in seconds
 
     const timerDisplay = document.getElementById('timerDisplay');
     const sessionDisplay = document.getElementById('sessionDisplay');
@@ -46,7 +50,7 @@
                 }
 
             } else {
-                timeLeft = 25; // Reset to 25 minutes for the next work session
+                timeLeft = work; // Reset to 25 minutes for the next work session
                 isWorkSession = true;
             }
 
@@ -62,9 +66,9 @@
 
 function setBreak(longBreak) {
     if (longBreak === true) {
-        timeLeft = 15; // 15 minutes break
+        timeLeft = longBreak; // 15 minutes break
     } else {
-        timeLeft = 5; // 5 minutes break
+        timeLeft = shortBreak; // 5 minutes break
     }
 
     isWorkSession = false;
@@ -83,3 +87,7 @@ resetButton.addEventListener('click', function reset() {
     timerDisplay.textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
     completedWorkSessions = 0;
 })
+
+function getMinutes(id) {
+    return parseInt(document.getElementById(id).textContent) * 60;
+}

@@ -58,7 +58,7 @@ namespace TaskamiUI.Controllers
             TempData["Success"] = "API klíč úspěšně uložen.";
 
 
-            return View(); // ✅ Tohle je důležité
+            return View();
 
         }
         // The page where users can view and manage their tasks - calendar mode
@@ -90,7 +90,6 @@ namespace TaskamiUI.Controllers
                 return RedirectToAction("Settings", "Home");
             }
 
-            // Např. zpracování výsledků
             var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.Value.GetRawText());
             ViewBag.Tasks = tasks ?? new List<TodoistTask>();
             return View();
