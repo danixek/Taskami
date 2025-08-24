@@ -21,6 +21,7 @@ body {
     background-color: #222;
     color: white;
     margin-bottom: 60px;
+    overflow-x: hidden;
 }
 
 /* Levý panel */

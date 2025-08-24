@@ -28,12 +28,14 @@ namespace TaskamiUI.Controllers
         public async Task<IActionResult> Inbox()
         {
             var rawJson = await _fetcher.FetchTodaysTasksAsync();
-            if (await _apiKeyHandler.IsApiKeyMissingAsync() || !JsonDocument.Parse(rawJson).RootElement.TryGetProperty("results", out var resultsElement))
+            var resultsElement = await TryApiKey(rawJson);
+
+            if (resultsElement is null)
             {
                 TempData["Error"] = "API klíč je neplatný nebo chybí. Prosím, zadej nový klíč v nastavení.";
                 return RedirectToAction("Settings", "Home");
             }
-            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.GetRawText());
+            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.Value.GetRawText());
 
             ViewBag.Tasks = tasks ?? new List<TodoistTask>();
 
@@ -43,12 +45,14 @@ namespace TaskamiUI.Controllers
         public async Task<IActionResult> Today()
         {
             var rawJson = await _fetcher.FetchTodaysTasksAsync();
-            if (await _apiKeyHandler.IsApiKeyMissingAsync() || !JsonDocument.Parse(rawJson).RootElement.TryGetProperty("results", out var resultsElement))
+            var resultsElement = await TryApiKey(rawJson);
+
+            if (resultsElement is null)
             {
                 TempData["Error"] = "API klíč je neplatný nebo chybí. Prosím, zadej nový klíč v nastavení.";
                 return RedirectToAction("Settings", "Home");
             }
-            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.GetRawText());
+            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.Value.GetRawText());
             ViewBag.Tasks = tasks ?? new List<TodoistTask>();
 
             TempData["Success"] = "API klíč úspěšně uložen.";
@@ -61,12 +65,15 @@ namespace TaskamiUI.Controllers
         public async Task<IActionResult> Calendar()
         {
             var rawJson = await _fetcher.FetchTodaysTasksAsync();
-            if (await _apiKeyHandler.IsApiKeyMissingAsync() || !JsonDocument.Parse(rawJson).RootElement.TryGetProperty("results", out var resultsElement))
+            var resultsElement = await TryApiKey(rawJson);
+
+            if (resultsElement is null)
             {
                 TempData["Error"] = "API klíč je neplatný nebo chybí. Prosím, zadej nový klíč v nastavení.";
                 return RedirectToAction("Settings", "Home");
             }
-            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.GetRawText());
+
+            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.Value.GetRawText());
 
             ViewBag.Tasks = tasks ?? new List<TodoistTask>();
             return View();
@@ -75,22 +82,22 @@ namespace TaskamiUI.Controllers
         public async Task<IActionResult> Filters()
         {
             var rawJson = await _fetcher.FetchTodaysTasksAsync();
-            if (await _apiKeyHandler.IsApiKeyMissingAsync() || !JsonDocument.Parse(rawJson).RootElement.TryGetProperty("results", out var resultsElement))
+            var resultsElement = await TryApiKey(rawJson);
+
+            if (resultsElement is null)
             {
                 TempData["Error"] = "API klíč je neplatný nebo chybí. Prosím, zadej nový klíč v nastavení.";
                 return RedirectToAction("Settings", "Home");
             }
+
+            // Např. zpracování výsledků
+            var tasks = JsonSerializer.Deserialize<List<TodoistTask>>(resultsElement.Value.GetRawText());
+            ViewBag.Tasks = tasks ?? new List<TodoistTask>();
             return View();
         }
         // Pomodoro is a time management technique that uses a timer to break work into intervals
-        public async Task<IActionResult> Pomodoro()
+        public IActionResult Pomodoro()
         {
-            var rawJson = await _fetcher.FetchTodaysTasksAsync();
-            if (await _apiKeyHandler.IsApiKeyMissingAsync() || !JsonDocument.Parse(rawJson).RootElement.TryGetProperty("results", out var resultsElement))
-            {
-                TempData["Error"] = "API klíč je neplatný nebo chybí. Prosím, zadej nový klíč v nastavení.";
-                return RedirectToAction("Settings", "Home");
-            }
             return View();
         }
         // The settings page where users can configure their preferences
@@ -153,5 +160,20 @@ namespace TaskamiUI.Controllers
 
             return RedirectToAction("Today", "Home");
         }
+
+        private async Task<JsonElement?> TryApiKey(string rawJson)
+        {
+            if (await _apiKeyHandler.IsApiKeyMissingAsync())
+                return null;
+
+            var root = JsonDocument.Parse(rawJson).RootElement;
+
+            if (!root.TryGetProperty("results", out var resultsElement))
+                return null;
+
+            return resultsElement;
+        }
+
+
     }
 }
