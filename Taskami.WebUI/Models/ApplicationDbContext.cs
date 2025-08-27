@@ -9,6 +9,5 @@ namespace Taskami.WebUI.Models
             : base(options)
         {
         }
-        public DbSet<ApiKeyModel> ApiKey { get; set; } = null!;
     }
 }

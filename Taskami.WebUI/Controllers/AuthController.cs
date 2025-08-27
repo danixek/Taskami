@@ -1,4 +1,5 @@
 ﻿using Azure.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Taskami.WebUI.Models;
 
 namespace Taskami.WebUI.Controllers
 {
+    [AllowAnonymous]
     public class AuthController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,6 +23,11 @@ namespace Taskami.WebUI.Controllers
             _signInManager = signInManager;
             _context = context;
             _logger = logger;
+        }
+        [AllowAnonymous]
+        public IActionResult Error()
+        {
+            return View();
         }
 
         [HttpGet]

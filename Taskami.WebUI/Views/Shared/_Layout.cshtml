@@ -1,6 +1,6 @@
 ﻿@{
-    string primaryBackgroundColor = Model.PrimaryColor as string ?? "#222222";
-    string secondaryBackgroundColor = Model.SecondaryColor as string ?? "#191919";
+    string primaryBackgroundColor = Model?.PrimaryColor as string ?? "#222222";
+    string secondaryBackgroundColor = Model?.SecondaryColor as string ?? "#191919";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -16,10 +16,10 @@
 <body>
     <style>
         :root {
-            --secondary-bg-color: @(ViewData["SecondaryBackgroundColor"] ?? ViewData["PrimaryBackgroundColor"]);
+            --secondary-bg-color: @(ViewData["SecondaryBackgroundColor"] ?? ViewData["PrimaryBackgroundColor"] ?? "#191919");
         }
         body {
-            background-color: @ViewData["PrimaryBackgroundColor"];
+            background-color: @(ViewData["PrimaryBackgroundColor"] ?? "#222222");
         }
     </style>
     <header>
