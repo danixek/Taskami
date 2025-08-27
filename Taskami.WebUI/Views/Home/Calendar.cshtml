@@ -1,42 +1,65 @@
-﻿@{
+﻿@model Taskami.WebUI.Models.BackgroundColorsViewModel<Taskami.WebUI.Models.CalendarViewModel>
+@{
     ViewData["Title"] = "Kalendář";
-    var tasks = ViewBag.Tasks as List<Taskami.WebUI.Models.TodoistTask> ?? new();
-    var todaysTasks = tasks.Where(t => t.Due != null && DateOnly.FromDateTime(t.Due.Date) == DateOnly.FromDateTime(DateTime.Today)).ToList() ?? new List<Taskami.WebUI.Models.TodoistTask>();
-    var tomorrowTasks = tasks
-        .Where(t => t.Due != null && DateOnly.FromDateTime(t.Due.Date) == DateOnly.FromDateTime(DateTime.Today.AddDays(1)))
-        .ToList();
+    var calendarTasks = Model.Tasks;
 }
 
-<div class="text-center my-5">
-    <h1 class="display-4">Taskami</h1>
-    <p>The To-Do list clone of Todoist.</p>
-</div>
+<partial name="_LogoHeader" />
 
 <div class="text-left my-5">
+
     <h2>Nadcházející</h2>
+
     <h3 class="mt-4 text-center fs-4">Dnes</h3>
-    @if (todaysTasks.Any())
+    @if (calendarTasks?.TodaysTasks != null && calendarTasks.TodaysTasks.Any())
     {
-        @await Html.PartialAsync("_LoadingTasks", todaysTasks)
+        @await Html.PartialAsync("_LoadingTasks", calendarTasks.TodaysTasks,
+        new ViewDataDictionary(ViewData)
+        {
+        { "PrimaryBackgroundColor", Model.PrimaryColor },
+        { "SecondaryBackgroundColor", Model.SecondaryColor }
+        })
+        }
+    else
+    {
+        <p class="text-muted text-center">Žádné úkoly na dnešek.</p>
     }
+
+
     <h3 class="mt-4 text-center fs-4">Zítra</h3>
-    @if (tomorrowTasks!.Any())
+    @if (calendarTasks?.TomorrowsTasks != null && calendarTasks.TomorrowsTasks.Any())
     {
-        @await Html.PartialAsync("_LoadingTasks", tomorrowTasks)
+        @await Html.PartialAsync("_LoadingTasks", calendarTasks.TomorrowsTasks,
+        new ViewDataDictionary(ViewData)
+        {
+        { "PrimaryBackgroundColor", Model.PrimaryColor },
+        { "SecondaryBackgroundColor", Model.SecondaryColor }
+        })
+        }
+    else
+    {
+        <p class="text-muted text-center">Žádné úkoly na zítra.</p>
     }
+
+
     @for (int i = 1; i <= 30; i++)
     {
-        var targetDate = DateOnly.FromDateTime(DateTime.Today.AddDays(1 + i));
-        var dayTasks = tasks
+        var targetDate = DateOnly.FromDateTime(DateTime.Today.AddDays(i));
+        var dayTasks = calendarTasks?.AllTasks
         .Where(t => t.Due != null && DateOnly.FromDateTime(t.Due.Date) == targetDate)
         .ToList();
 
-        if (dayTasks.Any())
+        if (dayTasks != null && dayTasks.Any())
         {
             <h3 class="mt-4 text-center fs-4">@targetDate.ToString("dddd, dd. MM. yyyy")</h3>
-            @await Html.PartialAsync("_LoadingTasks", dayTasks)
+            @await Html.PartialAsync("_LoadingTasks", dayTasks,
+            new ViewDataDictionary(ViewData)
+        {
+        { "PrimaryBackgroundColor", Model.PrimaryColor },
+        { "SecondaryBackgroundColor", Model.SecondaryColor }
+        })
         }
-    }
+        }
 
 
 </div>

@@ -1,5 +1,5 @@
 ﻿@{
     Layout = "_Layout";
-    ViewData["PrimaryBackgroundColor"] = "#222";
-    ViewData["SecondaryBackgroundColor"] = "rgb(25,25,25)";
+    ViewData["PrimaryBackgroundColor"] = Model?.PrimaryColor ?? "#222222";
+    ViewData["SecondaryBackgroundColor"] = Model?.SecondaryColor ?? "#191919";
 }

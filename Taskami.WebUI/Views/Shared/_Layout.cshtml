@@ -1,6 +1,6 @@
 ﻿@{
-    string primaryBackgroundColor = ViewData["PrimaryBackgroundColor"] as string ?? "#222";
-    string secondaryBackgroundColor = ViewData["SecondaryBackgroundColor"] as string ?? primaryBackgroundColor;
+    string primaryBackgroundColor = Model.PrimaryColor as string ?? "#222222";
+    string secondaryBackgroundColor = Model.SecondaryColor as string ?? "#191919";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -14,26 +14,43 @@
     <link rel="shortcut icon" href="~/img/taskami_logo.ico" type="image/x-icon">
 </head>
 <body>
-
+    <style>
+        :root {
+            --secondary-bg-color: @(ViewData["SecondaryBackgroundColor"] ?? ViewData["PrimaryBackgroundColor"]);
+        }
+        body {
+            background-color: @ViewData["PrimaryBackgroundColor"];
+        }
+    </style>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark box-shadow mb-3 px-2">
             <div class="container-fluid px-3">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    <img src="img/taskami_logo_ico.png" width="32" /><strong class="position-relative opacity-75" style="top: 3px; left: 3px">Taskami</strong>
+                    <img src="/img/taskami_logo_ico.png" width="32" /><strong class="position-relative opacity-75" style="top: 3px; left: 3px">Taskami</strong>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item ms-auto">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Account" asp-action="Index">Account</a>
-                        </li>
-                    </ul>
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
+        <div class="container">
+        @if (!string.IsNullOrEmpty(TempData["Error"] as string))
+        {
+            <div class="alert text-danger border-danger" role="alert">
+                @TempData["Error"]
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(TempData["Success"] as string))
+        {
+            <div class="alert text-success border-success" role="alert">
+                @TempData["Success"]
+            </div>
+        }
+        </div>
 
         <nav class="sidebar" style="background-color: @secondaryBackgroundColor">
             <a title="Inbox" asp-controller="Home" asp-action="Inbox"><i class="bi bi-house-door-fill"></i></a>

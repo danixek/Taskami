@@ -1,14 +1,10 @@
-﻿@{
+﻿@model Taskami.WebUI.Models.BackgroundColorsViewModel<List<Taskami.WebUI.Models.TodoistTask>>
+@{
     ViewData["Title"] = "Inbox";
-    var tasks = ViewBag.Tasks as List<Taskami.WebUI.Models.TodoistTask> ?? new();
-    var inboxTasks = tasks?.Where(t => t.ProjectId == "6F2RRjJg9xmgWH7q").ToList() ?? new List<Taskami.WebUI.Models.TodoistTask>();
-
+    var inboxTasks = Model.Tasks ?? new List<Taskami.WebUI.Models.TodoistTask>();
 }
 
-<div class="text-center my-5">
-    <h1 class="display-4">Taskami</h1>
-    <p>The To-Do list clone of Todoist.</p>
-</div>
+<partial name="_LogoHeader" />
 
 <div class="text-left mt-5 mb-3">
     <h2>Inbox</h2>

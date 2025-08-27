@@ -1,19 +1,17 @@
-﻿@{
+﻿@model PomodoroViewModel;
+@{
     ViewData["Title"] = "Inbox";
 }
 
-<div class="text-center my-5">
-    <h1 class="display-4">Taskami</h1>
-    <p>The To-Do list clone of Todoist.</p>
-</div>
+<partial name="_LogoHeader" />
 
-<span id="work" class="d-none">25</span>
-<span id="shortBreak" class="d-none">5</span>
-<span id="longBreak" class="d-none">15</span>
+<span id="work" class="d-none">@(Model.PomodoroDuration)</span>
+<span id="shortBreak" class="d-none">@(Model.PomodoroBreakDuration)</span>
+<span id="longBreak" class="d-none">@(Model.PomodoroLongBreakDuration)</span>
 
 <div class="text-center my-5">
     <h2>Pomodoro časovač</h2>
-    <span id="timerDisplay" class="display-1">25:00</span>
+    <span id="timerDisplay" class="display-1">@(Model.PomodoroDuration != 0 ? $"{Model.PomodoroDuration}:00" : "25:00")</span>
     <span id="sessionDisplay" class="mb-2 d-block text-center">0/4</span>
     <div class="w-100">
         <button id="startButton" class="btn btn-primary">Start</button>

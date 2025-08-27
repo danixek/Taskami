@@ -13,8 +13,10 @@ public class TodoistFetcher
         _httpClient = httpClient;
     }
 
-    public async Task<string> FetchTodaysTasksAsync()
+    public async Task<string> FetchTodaysTasksAsync(string apiKey)
     {
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+
         var url = "https://api.todoist.com/api/v1/tasks";
         var response = await _httpClient.GetAsync(url);
         return await response.Content.ReadAsStringAsync(); ;

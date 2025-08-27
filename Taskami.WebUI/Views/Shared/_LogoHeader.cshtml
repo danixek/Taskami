@@ -1,0 +1,12 @@
+﻿@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<div class="text-center my-5 transparent-bg">
+    @* if(asp-action == "Login" || asp-action == "Register") *@
+    @if (currentAction == "Login" || currentAction == "Register") {
+    <img src="/img/taskami_logo_ico.png" width="100" />
+    }
+    <h1 class="display-4">Taskami</h1>
+    <p>The To-Do list clone of Todoist.</p>
+</div>

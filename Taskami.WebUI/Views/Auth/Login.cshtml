@@ -1,0 +1,28 @@
+﻿@model Taskami.WebUI.Models.LoginViewModel
+
+<partial name="_LogoHeader" />
+
+<form asp-action="Login" method="post" class="d-flex flex-column align-items-center">
+    <h2 class="text-center mb-4">Přihlášení</h2>
+
+    <div class="mt-2 w-100" style="max-width: 200px;">
+        <label class="d-block mb-1">Email</label>
+        <input asp-for="Email" class="dark-input w-100" />
+        <span asp-validation-for="Email"></span>
+    </div>
+
+    <div class="mt-3 w-100" style="max-width: 200px;">
+        <label class="d-block mb-1">Heslo</label>
+        <input asp-for="Password" type="password" class="dark-input w-100" />
+        <span asp-validation-for="Password"></span>
+    </div>
+
+    <div class="mt-3 w-100" style="max-width: 200px;">
+        <div class="form-check">
+            <input asp-for="RememberMe" type="checkbox" class="form-check-input" />
+            <label class="form-check-label">Zapamatuj si mě</label>
+        </div>
+    </div>
+
+    <button type="submit" class="dark-button mt-4" style="width: 100px;">Přihlásit</button>
+</form>
